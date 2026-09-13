@@ -59,6 +59,7 @@ fun DisplayRefreshHost(
     val refreshDuration by hostState.flashMillis.collectAsState()
     val flashMode by hostState.flashMode.collectAsState()
     val flashInterval by hostState.flashIntervalPref.collectAsState()
+    val nativeFlash by hostState.nativeFlash.collectAsState()
 
     var currentColor by remember { mutableStateOf<Color?>(null) }
 
@@ -75,7 +76,7 @@ fun DisplayRefreshHost(
             context.sendBroadcast(intent)
 
         } else {
-        
+
             val refreshDurationHalf = refreshDuration.milliseconds / 2
             currentColor = if (flashMode == ReaderPreferences.FlashColor.BLACK) {
                 Color.Black
@@ -88,7 +89,7 @@ fun DisplayRefreshHost(
             }
             delay(refreshDurationHalf)
         }
-        
+
         hostState.currentDisplayRefresh = false
     }
 
