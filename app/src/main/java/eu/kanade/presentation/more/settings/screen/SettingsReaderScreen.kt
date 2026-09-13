@@ -115,7 +115,7 @@ object SettingsReaderScreen : SearchableSettings {
     @Composable
     private fun getEInkGroup(readerPreferences: ReaderPreferences): Preference.PreferenceGroup {
         val flashPageState by readerPreferences.flashOnPageChange.collectAsState()
-        val nativeFlash by readerPreferences.nativeFlash().collectAsState()
+        val nativeFlash by readerPreferences.nativeFlash.collectAsState()
         val flashMillisPref = readerPreferences.flashDurationMillis
         val flashMillis by flashMillisPref.collectAsState()
 
@@ -133,7 +133,7 @@ object SettingsReaderScreen : SearchableSettings {
                     subtitle = stringResource(MR.strings.pref_flash_page_summ),
                 ),
                 Preference.PreferenceItem.SwitchPreference(
-                    preference = readerPreferences.nativeFlash(),
+                    preference = readerPreferences.nativeFlash,
                     title = "Use native flash on page change",
                     subtitle = "Solo para aparatos con aura",
                     enabled = flashPageState,

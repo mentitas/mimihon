@@ -38,7 +38,7 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
 
     val flashPageState by viewModel.preferences.flashOnPageChange.collectAsState()
     val nativeFlash by viewModel.preferences.nativeFlash.collectAsState()
-    
+
     val flashMillisPref = viewModel.preferences.flashDurationMillis
     val flashMillis by flashMillisPref.collectAsState()
 
@@ -47,7 +47,7 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
 
     val flashColorPref = viewModel.preferences.flashColor
     val flashColor by flashColorPref.collectAsState()
-    
+
     if (!nativeFlash){
         SettingsChipRow(MR.strings.pref_reader_theme) {
             themes.map { (labelRes, value) ->
@@ -142,7 +142,7 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
     if (flashPageState) {
         CheckboxItem(
             label = "Use native flash on page change",
-            pref = screenModel.preferences.nativeFlash(),
+            pref = viewModel.preferences.nativeFlash,
         )
         SliderItem(
             value = flashMillis / ReaderPreferences.MILLI_CONVERSION,
