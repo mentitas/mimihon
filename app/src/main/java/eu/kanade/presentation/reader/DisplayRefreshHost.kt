@@ -17,6 +17,8 @@ import tachiyomi.presentation.core.util.collectAsState
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import kotlin.time.Duration.Companion.milliseconds
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
 
 @Stable
 class DisplayRefreshHost {
@@ -28,6 +30,7 @@ class DisplayRefreshHost {
     internal val flashMode = readerPreferences.flashColor
 
     internal val flashIntervalPref = readerPreferences.flashPageInterval
+    internal val nativeFlash = readerPreferences.nativeFlash
 
     // Internal State for Flash
     private var flashInterval = flashIntervalPref.get()
@@ -51,6 +54,7 @@ fun DisplayRefreshHost(
     hostState: DisplayRefreshHost,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val currentDisplayRefresh = hostState.currentDisplayRefresh
     val refreshDuration by hostState.flashMillis.collectAsState()
     val flashMode by hostState.flashMode.collectAsState()
@@ -64,17 +68,27 @@ fun DisplayRefreshHost(
             return@LaunchedEffect
         }
 
-        val refreshDurationHalf = refreshDuration.milliseconds / 2
-        currentColor = if (flashMode == ReaderPreferences.FlashColor.BLACK) {
-            Color.Black
+        if (nativeFlash) {
+
+            delay(refreshDuration.milliseconds)
+            val intent = Intent("com.haoqing.action.FULL_REFRESH")
+            context.sendBroadcast(intent)
+
         } else {
-            Color.White
+        
+            val refreshDurationHalf = refreshDuration.milliseconds / 2
+            currentColor = if (flashMode == ReaderPreferences.FlashColor.BLACK) {
+                Color.Black
+            } else {
+                Color.White
+            }
+            delay(refreshDurationHalf)
+            if (flashMode == ReaderPreferences.FlashColor.WHITE_BLACK) {
+                currentColor = Color.Black
+            }
+            delay(refreshDurationHalf)
         }
-        delay(refreshDurationHalf)
-        if (flashMode == ReaderPreferences.FlashColor.WHITE_BLACK) {
-            currentColor = Color.Black
-        }
-        delay(refreshDurationHalf)
+        
         hostState.currentDisplayRefresh = false
     }
 

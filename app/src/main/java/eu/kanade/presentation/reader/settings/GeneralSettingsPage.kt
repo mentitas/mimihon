@@ -37,7 +37,8 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
     val readerTheme by viewModel.preferences.readerTheme.collectAsState()
 
     val flashPageState by viewModel.preferences.flashOnPageChange.collectAsState()
-
+    val nativeFlash by viewModel.preferences.nativeFlash.collectAsState()
+    
     val flashMillisPref = viewModel.preferences.flashDurationMillis
     val flashMillis by flashMillisPref.collectAsState()
 
@@ -46,14 +47,16 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
 
     val flashColorPref = viewModel.preferences.flashColor
     val flashColor by flashColorPref.collectAsState()
-
-    SettingsChipRow(MR.strings.pref_reader_theme) {
-        themes.map { (labelRes, value) ->
-            FilterChip(
-                selected = readerTheme == value,
-                onClick = { viewModel.preferences.readerTheme.set(value) },
-                label = { Text(stringResource(labelRes)) },
-            )
+    
+    if (!nativeFlash){
+        SettingsChipRow(MR.strings.pref_reader_theme) {
+            themes.map { (labelRes, value) ->
+                FilterChip(
+                    selected = readerTheme == value,
+                    onClick = { viewModel.preferences.readerTheme.set(value) },
+                    label = { Text(stringResource(labelRes)) },
+                )
+            }
         }
     }
 
@@ -137,6 +140,10 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
         pref = viewModel.preferences.flashOnPageChange,
     )
     if (flashPageState) {
+        CheckboxItem(
+            label = "Use native flash on page change",
+            pref = screenModel.preferences.nativeFlash(),
+        )
         SliderItem(
             value = flashMillis / ReaderPreferences.MILLI_CONVERSION,
             valueRange = 1..15,
@@ -155,13 +162,15 @@ internal fun ColumnScope.GeneralPage(viewModel: ReaderSettingsViewModel) {
             },
             pillColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         )
-        SettingsChipRow(MR.strings.pref_flash_with) {
-            flashColors.map { (labelRes, value) ->
-                FilterChip(
-                    selected = flashColor == value,
-                    onClick = { flashColorPref.set(value) },
-                    label = { Text(stringResource(labelRes)) },
-                )
+        if (!nativeFlash){
+            SettingsChipRow(MR.strings.pref_flash_with) {
+                flashColors.map { (labelRes, value) ->
+                    FilterChip(
+                        selected = flashColor == value,
+                        onClick = { flashColorPref.set(value) },
+                        label = { Text(stringResource(labelRes)) },
+                    )
+                }
             }
         }
     }
