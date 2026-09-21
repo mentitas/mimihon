@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import androidx.core.graphics.Insets
@@ -263,7 +264,8 @@ class ReaderActivity : BaseActivity() {
                     currentPage = state.currentPage,
                     totalPages = state.totalPages,
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
+                        .align(Alignment.BottomEnd)
+                        .rotate(90f)
                         .navigationBarsPadding(),
                 )
             }
