@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import androidx.viewpager.widget.DirectionalViewPager
 import eu.kanade.tachiyomi.ui.reader.viewer.GestureDetectorWithLongTap
+import kotlin.math.abs
 
 /**
  * Pager implementation that listens for tap and long tap and allows temporarily disabling touch
@@ -16,6 +17,10 @@ open class Pager(
     context: Context,
     isHorizontal: Boolean = true,
 ) : DirectionalViewPager(context, isHorizontal) {
+
+    private var startX: Float = 0F
+    private var startY: Float = 0F
+    private var isJumpTriggered = false
 
     /**
      * Tap listener function to execute when a tap is detected.
@@ -70,7 +75,34 @@ open class Pager(
      * views manipulate [requestDisallowInterceptTouchEvent].
      */
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+
         return try {
+            when (ev.action) {
+
+                MotionEvent.ACTION_DOWN -> {
+                    startX = ev.x
+                    startY = ev.y
+                    isJumpTriggered = false
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+
+                    val diffX = ev.x - startX
+                    val diffY = ev.y - startY
+
+                    val diffMax = maxOf(diffX, diffY, compareBy { abs(it) })
+
+                    if (abs(diffMax) > 20 && !isJumpTriggered) {
+                        isJumpTriggered = true
+                        if (diffMax > 0) {
+                            setCurrentItem(currentItem - 1, false)
+                        } else {
+                            setCurrentItem(currentItem + 1, false)
+                        }
+                        return true
+                    }
+                }
+            }
             super.onInterceptTouchEvent(ev)
         } catch (e: IllegalArgumentException) {
             false
@@ -82,6 +114,9 @@ open class Pager(
      * [requestDisallowInterceptTouchEvent].
      */
     override fun onTouchEvent(ev: MotionEvent): Boolean {
+
+        if (isJumpTriggered) return true
+
         return try {
             super.onTouchEvent(ev)
         } catch (e: NullPointerException) {
